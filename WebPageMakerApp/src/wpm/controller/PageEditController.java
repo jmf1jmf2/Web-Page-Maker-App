@@ -35,7 +35,7 @@ public class PageEditController {
     WebPageMaker app;
 
     // WE USE THIS TO MAKE SURE OUR PROGRAMMED UPDATES OF UI
-    // VALUES DON'T THEMSELVES TRIGGER EVENTS
+    // VALUES DON'T THEMSELVES TRIGGEFR EVENTS
     private boolean enabled;
 
     /**
@@ -44,8 +44,8 @@ public class PageEditController {
      * @param initApp The JavaFX application this controller is associated with.
      */
     public PageEditController(WebPageMaker initApp) {
-	// KEEP IT FOR LATER
-	app = initApp;
+        // KEEP IT FOR LATER
+        app = initApp;
     }
 
     /**
@@ -55,7 +55,7 @@ public class PageEditController {
      * workspace editing. If true, it will.
      */
     public void enable(boolean enableSetting) {
-	enabled = enableSetting;
+        enabled = enableSetting;
     }
 
     /**
@@ -74,25 +74,25 @@ public class PageEditController {
      * updated.
      */
     public void handleAttributeUpdate(HTMLTagPrototype selectedTag, String attributeName, String attributeValue) {
-	if (enabled) {
-	    try {
-		// FIRST UPDATE THE ELEMENT'S DATA
-		selectedTag.addAttribute(attributeName, attributeValue);
+        if (enabled) {
+            try {
+                // FIRST UPDATE THE ELEMENT'S DATA
+                selectedTag.addAttribute(attributeName, attributeValue);
 
-		// THEN FORCE THE CHANGES TO THE TEMP HTML PAGE
-		FileManager fileManager = (FileManager) app.getFileComponent();
-		fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
+                // THEN FORCE THE CHANGES TO THE TEMP HTML PAGE
+                FileManager fileManager = (FileManager) app.getFileComponent();
+                fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
 
-		// AND FINALLY UPDATE THE WEB PAGE DISPLAY USING THE NEW VALUES
-		Workspace workspace = (Workspace) app.getWorkspaceComponent();
-		workspace.getHTMLEngine().reload();
-	    } catch (IOException ioe) {
-		// AN ERROR HAPPENED WRITING TO THE TEMP FILE, NOTIFY THE USER
-		PropertiesManager props = PropertiesManager.getPropertiesManager();
-		AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
-		dialog.show(props.getProperty(ATTRIBUTE_UPDATE_ERROR_TITLE), props.getProperty(ATTRIBUTE_UPDATE_ERROR_MESSAGE));
-	    }
-	}
+                // AND FINALLY UPDATE THE WEB PAGE DISPLAY USING THE NEW VALUES
+                Workspace workspace = (Workspace) app.getWorkspaceComponent();
+                workspace.getHTMLEngine().reload();
+            } catch (IOException ioe) {
+                // AN ERROR HAPPENED WRITING TO THE TEMP FILE, NOTIFY THE USER
+                PropertiesManager props = PropertiesManager.getPropertiesManager();
+                AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+                dialog.show(props.getProperty(ATTRIBUTE_UPDATE_ERROR_TITLE), props.getProperty(ATTRIBUTE_UPDATE_ERROR_MESSAGE));
+            }
+        }
     }
 
     /**
@@ -101,19 +101,19 @@ public class PageEditController {
      *
      * @param element The element to add to the tree.
      */
-    public void handleAddElementRequest(HTMLTagPrototype element){
-	if (enabled) {
-	    Workspace workspace = (Workspace) app.getWorkspaceComponent();
+    public void handleAddElementRequest(HTMLTagPrototype element) {
+        if (enabled) {
+            Workspace workspace = (Workspace) app.getWorkspaceComponent();
 
-	    // GET THE TREE TO SEE WHICH NODE IS CURRENTLY SELECTED
-	    TreeView tree = workspace.getHTMLTree();
-	    TreeItem selectedItem = (TreeItem) tree.getSelectionModel().getSelectedItem();
-	    HTMLTagPrototype selectedTag = (HTMLTagPrototype) selectedItem.getValue();
+            // GET THE TREE TO SEE WHICH NODE IS CURRENTLY SELECTED
+            TreeView tree = workspace.getHTMLTree();
+            TreeItem selectedItem = (TreeItem) tree.getSelectionModel().getSelectedItem();
+            HTMLTagPrototype selectedTag = (HTMLTagPrototype) selectedItem.getValue();
             String testParent = selectedTag.getTagName();
 
-	    // MAKE A NEW HTMLTagPrototype AND PUT IT IN A NODE
-	    HTMLTagPrototype newTag = element.clone();
-            if (newTag.isLegalParent(testParent)){
+            // MAKE A NEW HTMLTagPrototype AND PUT IT IN A NODE
+            HTMLTagPrototype newTag = element.clone();
+            if (newTag.isLegalParent(testParent)) {
                 TreeItem newNode = new TreeItem(newTag);
 
                 // ADD THE NEW NODE
@@ -125,22 +125,38 @@ public class PageEditController {
 
                 // FORCE A RELOAD OF TAG EDITOR
                 workspace.reloadWorkspace();
-            }
-            else {
+            } else {
                 System.out.println("ILLEGAL PARENT EXCEPTION: Please select a valid parent for the selected html tag.");
             }
         }
 
-	    try {
-		FileManager fileManager = (FileManager) app.getFileComponent();
-		fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
-	    } catch (IOException ioe) {
-		// AN ERROR HAPPENED WRITING TO THE TEMP FILE, NOTIFY THE USER
-		PropertiesManager props = PropertiesManager.getPropertiesManager();
-		AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
-		dialog.show(props.getProperty(ADD_ELEMENT_ERROR_TITLE), props.getProperty(ADD_ELEMENT_ERROR_MESSAGE));
-	    }
-	}
+        try {
+            FileManager fileManager = (FileManager) app.getFileComponent();
+            fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
+        } catch (IOException ioe) {
+            // AN ERROR HAPPENED WRITING TO THE TEMP FILE, NOTIFY THE USER
+            PropertiesManager props = PropertiesManager.getPropertiesManager();
+            AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+            dialog.show(props.getProperty(ADD_ELEMENT_ERROR_TITLE), props.getProperty(ADD_ELEMENT_ERROR_MESSAGE));
+        }
+    }
+
+    public void handleRemoveElementRequest() {
+        if (enabled) {
+            Workspace workspace = (Workspace) app.getWorkspaceComponent();
+
+            TreeView tree = workspace.getHTMLTree();
+            TreeItem selectedItem = (TreeItem) tree.getSelectionModel().getSelectedItem();
+            HTMLTagPrototype selectedTag = (HTMLTagPrototype) selectedItem.getValue();
+
+            if (selectedTag.getTagName().equals("html") || selectedTag.getTagName().equals("head") || selectedTag.getTagName().equals("title") || selectedTag.getTagName().equals("link") || selectedTag.getTagName().equals("body")) {
+                System.out.println("CANNOT REMOVE ELEMENT, PLEASE PICK A VALID ELEMENT FOR REMOVAL.");
+            } else {
+                selectedItem.getParent().getChildren().clear();
+            }
+            workspace.reloadWorkspace();
+        }
+    }
 
     /**
      * This function provides a response to when the user changes the CSS
@@ -151,25 +167,25 @@ public class PageEditController {
      *
      */
     public void handleCSSEditing(String cssContent) {
-	if (enabled) {
-	    try {
-		// MAKE SURE THE DATA MANAGER GETS THE CSS TEXT
-		DataManager dataManager = (DataManager) app.getDataComponent();
-		dataManager.setCSSText(cssContent);
+        if (enabled) {
+            try {
+                // MAKE SURE THE DATA MANAGER GETS THE CSS TEXT
+                DataManager dataManager = (DataManager) app.getDataComponent();
+                dataManager.setCSSText(cssContent);
 
-		// WRITE OUT THE TEXT TO THE CSS FILE
-		FileManager fileManager = (FileManager) app.getFileComponent();
-		fileManager.exportCSS(cssContent, TEMP_CSS_PATH);
+                // WRITE OUT THE TEXT TO THE CSS FILE
+                FileManager fileManager = (FileManager) app.getFileComponent();
+                fileManager.exportCSS(cssContent, TEMP_CSS_PATH);
 
-		// REFRESH THE HTML VIEW VIA THE ENGINE
-		Workspace workspace = (Workspace) app.getWorkspaceComponent();
-		WebEngine htmlEngine = workspace.getHTMLEngine();
-		htmlEngine.reload();
-	    } catch (IOException ioe) {
-		AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
-		PropertiesManager props = PropertiesManager.getPropertiesManager();
-		dialog.show(props.getProperty(CSS_EXPORT_ERROR_TITLE), props.getProperty(CSS_EXPORT_ERROR_MESSAGE));
-	    }
-	}
+                // REFRESH THE HTML VIEW VIA THE ENGINE
+                Workspace workspace = (Workspace) app.getWorkspaceComponent();
+                WebEngine htmlEngine = workspace.getHTMLEngine();
+                htmlEngine.reload();
+            } catch (IOException ioe) {
+                AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+                PropertiesManager props = PropertiesManager.getPropertiesManager();
+                dialog.show(props.getProperty(CSS_EXPORT_ERROR_TITLE), props.getProperty(CSS_EXPORT_ERROR_MESSAGE));
+            }
+        }
     }
 }
