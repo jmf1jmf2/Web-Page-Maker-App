@@ -23,15 +23,16 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.BorderFactory;
 import properties_manager.PropertiesManager;
 import saf.ui.AppGUI;
 import wpm.data.HTMLTagPrototype;
@@ -316,7 +317,9 @@ public class Workspace extends AppWorkspaceComponent {
 	    b.getStyleClass().add(CLASS_TAG_BUTTON);
         }
 	leftPane.getStyleClass().add(CLASS_MAX_PANE);
+        tagToolbar.setStyle("-fx-border-color: black");
 	treeScrollPane.getStyleClass().add(CLASS_MAX_PANE);
+        treeScrollPane.setStyle("-fx-border-color: blue");
 	tagEditorLabel.getStyleClass().add(CLASS_HEADING_LABEL);
     }
 
