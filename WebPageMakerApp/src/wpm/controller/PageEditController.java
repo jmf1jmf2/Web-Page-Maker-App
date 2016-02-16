@@ -5,7 +5,10 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.web.WebEngine;
 import properties_manager.PropertiesManager;
+import static saf.settings.AppPropertyType.SAVE_UNSAVED_WORK_MESSAGE;
+import static saf.settings.AppPropertyType.SAVE_UNSAVED_WORK_TITLE;
 import saf.ui.AppMessageDialogSingleton;
+import saf.ui.AppYesNoCancelDialogSingleton;
 import static wpm.PropertyType.ADD_ELEMENT_ERROR_MESSAGE;
 import static wpm.PropertyType.ADD_ELEMENT_ERROR_TITLE;
 import static wpm.PropertyType.ATTRIBUTE_UPDATE_ERROR_MESSAGE;
@@ -152,8 +155,13 @@ public class PageEditController {
             if (selectedTag.getTagName().equals("html") || selectedTag.getTagName().equals("head") || selectedTag.getTagName().equals("title") || selectedTag.getTagName().equals("link") || selectedTag.getTagName().equals("body")) {
                 System.out.println("CANNOT REMOVE ELEMENT, PLEASE PICK A VALID ELEMENT FOR REMOVAL.");
             } else {
-                selectedItem.getParent().getChildren().clear();
-            }
+                PropertiesManager props = PropertiesManager.getPropertiesManager();
+                AppYesNoCancelDialogSingleton yesNoDialog = AppYesNoCancelDialogSingleton.getSingleton();
+                yesNoDialog.show("Remove Item?", "Are you sure you want to remove this item?");
+                if(yesNoDialog.getSelection().equals(AppYesNoCancelDialogSingleton.YES)) {
+                    selectedItem.getParent().getChildren().clear();
+                }
+              }
             workspace.reloadWorkspace();
         }
     }
