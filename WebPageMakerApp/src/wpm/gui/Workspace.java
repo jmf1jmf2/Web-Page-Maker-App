@@ -21,6 +21,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -35,6 +37,8 @@ import saf.ui.AppGUI;
 import wpm.data.HTMLTagPrototype;
 import saf.AppTemplate;
 import saf.components.AppWorkspaceComponent;
+import static saf.settings.AppStartupConstants.FILE_PROTOCOL;
+import static saf.settings.AppStartupConstants.PATH_IMAGES;
 import wpm.PropertyType;
 import static wpm.PropertyType.TEMP_PAGE_LOAD_ERROR_MESSAGE;
 import static wpm.PropertyType.TEMP_PAGE_LOAD_ERROR_TITLE;
@@ -162,13 +166,28 @@ public class Workspace extends AppWorkspaceComponent {
 	dataManager.setHTMLRoot(htmlRoot);
 	dataManager.reset();
 
+        PropertiesManager props = PropertiesManager.getPropertiesManager();
+        String imagePath = FILE_PROTOCOL + PATH_IMAGES + "RemoveElement.png";
+        Image buttonImage = new Image(imagePath);
+        
+        Button removeButton = new Button();
+        removeButton.setGraphic(new ImageView(buttonImage));
+        removeButton.setMaxWidth(BUTTON_TAG_WIDTH);
+	removeButton.setMinWidth(BUTTON_TAG_WIDTH);
+	removeButton.setPrefWidth(BUTTON_TAG_WIDTH);
+        tagToolbar.getChildren().add(removeButton);
+        removeButton.getStyleClass().add(CLASS_TAG_BUTTON);
+         
+         
+        removeButton.setOnAction(e -> {
+        pageEditController.handleRemoveElementRequest(); 
+        });
         
 	// AND NOW USE THE LOADED TAG TYPES TO ADD BUTTONS
 	for (HTMLTagPrototype tag : dataManager.getTags()) {
 	    // MAKE THE BUTTON
             
 	    Button tagButton = new Button(tag.getTagName());
-            //Button removeButton = new Button(removeX);
 	    tagButtons.add(tagButton);
 	    tagButton.setMaxWidth(BUTTON_TAG_WIDTH);
 	    tagButton.setMinWidth(BUTTON_TAG_WIDTH);
@@ -184,18 +203,7 @@ public class Workspace extends AppWorkspaceComponent {
 	    });
         }
         
-                
-        Button removeButton = new Button();
-         removeButton.setMaxWidth(BUTTON_TAG_WIDTH);
-	 removeButton.setMinWidth(BUTTON_TAG_WIDTH);
-	 removeButton.setPrefWidth(BUTTON_TAG_WIDTH);
-         tagToolbar.getChildren().add(removeButton);
-         removeButton.setOnAction(e -> {
-         pageEditController.handleRemoveElementRequest(); 
-        });
-            
-
-	// AND NOW THE REGION FOR EDITING TAG PROPERTIES
+        // AND NOW THE REGION FOR EDITING TAG PROPERTIES
 	tagEditorPane = new GridPane();
 	tagEditorScrollPane = new ScrollPane(tagEditorPane);
 	tagEditorLabel = new Label("Tag Editor");
@@ -306,7 +314,7 @@ public class Workspace extends AppWorkspaceComponent {
 	tagToolbar.getStyleClass().add(CLASS_BORDERED_PANE);
 	for (Button b : tagButtons) {
 	    b.getStyleClass().add(CLASS_TAG_BUTTON);
-	}
+        }
 	leftPane.getStyleClass().add(CLASS_MAX_PANE);
 	treeScrollPane.getStyleClass().add(CLASS_MAX_PANE);
 	tagEditorLabel.getStyleClass().add(CLASS_HEADING_LABEL);
