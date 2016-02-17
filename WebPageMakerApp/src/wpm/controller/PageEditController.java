@@ -1,14 +1,15 @@
 package wpm.controller;
 
 import java.io.IOException;
+import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.web.WebEngine;
 import properties_manager.PropertiesManager;
-import static saf.settings.AppPropertyType.SAVE_UNSAVED_WORK_MESSAGE;
-import static saf.settings.AppPropertyType.SAVE_UNSAVED_WORK_TITLE;
 import saf.ui.AppMessageDialogSingleton;
 import saf.ui.AppYesNoCancelDialogSingleton;
+import saf.controller.AppFileController;
+import saf.ui.AppGUI;
 import static wpm.PropertyType.ADD_ELEMENT_ERROR_MESSAGE;
 import static wpm.PropertyType.ADD_ELEMENT_ERROR_TITLE;
 import static wpm.PropertyType.ATTRIBUTE_UPDATE_ERROR_MESSAGE;
@@ -40,7 +41,7 @@ public class PageEditController {
     // WE USE THIS TO MAKE SURE OUR PROGRAMMED UPDATES OF UI
     // VALUES DON'T THEMSELVES TRIGGEFR EVENTS
     private boolean enabled;
-
+    
     /**
      * Constructor for initializing this object, it will keep the app for later.
      *
@@ -81,7 +82,8 @@ public class PageEditController {
             try {
                 // FIRST UPDATE THE ELEMENT'S DATA
                 selectedTag.addAttribute(attributeName, attributeValue);
-
+                app.getGUI().updateToolbarControls(false);
+                          
                 // THEN FORCE THE CHANGES TO THE TEMP HTML PAGE
                 FileManager fileManager = (FileManager) app.getFileComponent();
                 fileManager.exportData(app.getDataComponent(), TEMP_PAGE);
@@ -107,12 +109,17 @@ public class PageEditController {
     public void handleAddElementRequest(HTMLTagPrototype element) {
         if (enabled) {
             Workspace workspace = (Workspace) app.getWorkspaceComponent();
+            PropertiesManager props = PropertiesManager.getPropertiesManager();
+            
 
             // GET THE TREE TO SEE WHICH NODE IS CURRENTLY SELECTED
             TreeView tree = workspace.getHTMLTree();
             TreeItem selectedItem = (TreeItem) tree.getSelectionModel().getSelectedItem();
             HTMLTagPrototype selectedTag = (HTMLTagPrototype) selectedItem.getValue();
             String testParent = selectedTag.getTagName();
+            String openingTagText = "<" + selectedTag.getTagName() + ">";
+            String closingTagText = "</" + selectedTag.getTagName() + ">";
+            
 
             // MAKE A NEW HTMLTagPrototype AND PUT IT IN A NODE
             HTMLTagPrototype newTag = element.clone();
@@ -125,11 +132,13 @@ public class PageEditController {
                 // SELECT THE NEW NODE
                 tree.getSelectionModel().select(newNode);
                 selectedItem.setExpanded(true);
+                app.getGUI().updateToolbarControls(false);
 
                 // FORCE A RELOAD OF TAG EDITOR
                 workspace.reloadWorkspace();
             } else {
-                System.out.println("ILLEGAL PARENT EXCEPTION: Please select a valid parent for the selected html tag.");
+                AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+                dialog.show("Illegal Parent Error", "Parent node is not valid for this tag.");
             }
         }
 
@@ -153,13 +162,14 @@ public class PageEditController {
             HTMLTagPrototype selectedTag = (HTMLTagPrototype) selectedItem.getValue();
 
             if (selectedTag.getTagName().equals("html") || selectedTag.getTagName().equals("head") || selectedTag.getTagName().equals("title") || selectedTag.getTagName().equals("link") || selectedTag.getTagName().equals("body")) {
-                System.out.println("CANNOT REMOVE ELEMENT, PLEASE PICK A VALID ELEMENT FOR REMOVAL.");
+                AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+                dialog.show("Illegal Rmoval Error", "Node is not valid for removal.");
             } else {
-                PropertiesManager props = PropertiesManager.getPropertiesManager();
                 AppYesNoCancelDialogSingleton yesNoDialog = AppYesNoCancelDialogSingleton.getSingleton();
                 yesNoDialog.show("Remove Item?", "Are you sure you want to remove this item?");
                 if(yesNoDialog.getSelection().equals(AppYesNoCancelDialogSingleton.YES)) {
                     selectedItem.getParent().getChildren().clear();
+                    app.getGUI().updateToolbarControls(false);
                 }
               }
             workspace.reloadWorkspace();
