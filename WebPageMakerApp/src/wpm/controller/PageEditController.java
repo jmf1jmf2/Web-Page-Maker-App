@@ -1,6 +1,7 @@
 package wpm.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -111,7 +112,7 @@ public class PageEditController {
             Workspace workspace = (Workspace) app.getWorkspaceComponent();
             PropertiesManager props = PropertiesManager.getPropertiesManager();
             
-
+            try{
             // GET THE TREE TO SEE WHICH NODE IS CURRENTLY SELECTED
             TreeView tree = workspace.getHTMLTree();
             TreeItem selectedItem = (TreeItem) tree.getSelectionModel().getSelectedItem();
@@ -120,7 +121,7 @@ public class PageEditController {
             String openingTagText = "<" + selectedTag.getTagName() + ">";
             String closingTagText = "</" + selectedTag.getTagName() + ">";
             
-
+            
             // MAKE A NEW HTMLTagPrototype AND PUT IT IN A NODE
             HTMLTagPrototype newTag = element.clone();
             if (newTag.isLegalParent(testParent)) {
@@ -139,6 +140,11 @@ public class PageEditController {
             } else {
                 AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
                 dialog.show("Illegal Parent Error", "Parent node is not valid for this tag.");
+            }
+            }
+            catch (NullPointerException npe) {
+                AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+                dialog.show("Error", "You must select a tag to add to.");
             }
         }
 
@@ -163,7 +169,7 @@ public class PageEditController {
 
             if (selectedTag.getTagName().equals("html") || selectedTag.getTagName().equals("head") || selectedTag.getTagName().equals("title") || selectedTag.getTagName().equals("link") || selectedTag.getTagName().equals("body")) {
                 AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
-                dialog.show("Illegal Rmoval Error", "Node is not valid for removal.");
+                dialog.show("Illegal Removal Error", "Node is not valid for removal.");
             } else {
                 AppYesNoCancelDialogSingleton yesNoDialog = AppYesNoCancelDialogSingleton.getSingleton();
                 yesNoDialog.show("Remove Item?", "Are you sure you want to remove this item?");
