@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -238,16 +237,37 @@ public class FileManager implements AppFileComponent {
             for(Object child : list) {
                 TreeItem treeChild = (TreeItem) child;
                 HTMLTagPrototype newTag = (HTMLTagPrototype) treeChild.getValue();
-                HashMap<String, String> attributes = newTag.getAttributes();
-                Collection<String> keys = attributes.keySet();
                 writer.write(newTag.toString());
-                //for(String attributeName: keys) {
-                //}
                 ObservableList childList = treeChild.getChildren();
                 for(Object newChild : childList) {
                     TreeItem nextTreeChild = (TreeItem) newChild;
                     HTMLTagPrototype newNewTag = (HTMLTagPrototype) nextTreeChild.getValue();
-                    writer.write(newNewTag.toString() + "\n");
+                    HashMap<String, String> attributes = newNewTag.getAttributes();
+                    Collection<String> keys = attributes.keySet();
+                        if (newNewTag.getTagName().equalsIgnoreCase("a")) {
+                            writer.write("<" + newNewTag.getTagName() + " href=\"" + newNewTag.getAttribute("href") + "\">");
+                        }   
+                        else if (newNewTag.getTagName().equalsIgnoreCase("title")) {
+                            writer.write(newNewTag.toString() + "\n");
+                        }
+                        else if (newNewTag.getTagName().equalsIgnoreCase("text")) {
+                            writer.write(newNewTag.getAttribute("text"));
+                        }
+                        else if (newNewTag.getTagName().equalsIgnoreCase("p")) {
+                            writer.write("<" + newNewTag.getTagName() + " class=\"" + newNewTag.getAttribute("class") + "\"" + ">");
+                        }
+                        else if (newTag.getTagName().equalsIgnoreCase("img")) {
+                            writer.write("<" + newNewTag.getTagName() + " src=\"" + newNewTag.getAttribute("src") + "\" " + "alt=\"" + newNewTag.getAttribute("alt") + "\">");
+                        }
+                        else if (newNewTag.getTagName().equalsIgnoreCase("br") || newNewTag.getTagName().equalsIgnoreCase("head") || newNewTag.getTagName().equalsIgnoreCase("title")) {
+                        //do nothing
+                        }
+                        else if (newNewTag.getTagName().equalsIgnoreCase("link")) {
+                            writer.write("<" + newNewTag.getTagName() + " rel=\"" + newNewTag.getAttribute("rel") + "\"" + " href=\"" + newNewTag.getAttribute("href") + "\" type=\"" + newNewTag.getAttribute("type") + "\">");
+                        }
+                        else {
+                            writer.write("<" + newNewTag.getTagName() + " class=\"" + newNewTag.getAttribute("class") + "\" " + "id=\"" + newNewTag.getAttribute("id") + "\">");
+                        }
                     if(newNewTag.hasClosingTag()) {
                         writer.write("</" + newNewTag.getTagName() + ">\n");
                     }
