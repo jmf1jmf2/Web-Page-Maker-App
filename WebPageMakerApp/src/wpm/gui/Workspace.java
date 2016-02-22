@@ -178,7 +178,6 @@ public class Workspace extends AppWorkspaceComponent {
         removeButton.setOnAction(e -> {
             pageEditController.handleRemoveElementRequest();
         });
-     
 
         // AND NOW USE THE LOADED TAG TYPES TO ADD BUTTONS
         for (HTMLTagPrototype tag : dataManager.getTags()) {
@@ -190,7 +189,7 @@ public class Workspace extends AppWorkspaceComponent {
             tagButton.setMinWidth(BUTTON_TAG_WIDTH);
             tagButton.setPrefWidth(BUTTON_TAG_WIDTH);
             tagToolbar.getChildren().add(tagButton);
-            
+
             // INIT ITS EVENT HANDLER
             tagButton.setOnAction(e -> {
                 String tagName = tagButton.getText();
@@ -200,7 +199,7 @@ public class Workspace extends AppWorkspaceComponent {
         }
 
         // AND NOW THE REGION FOR EDITING TAG PROPERTIES
-	tagEditorPane = new GridPane();
+        tagEditorPane = new GridPane();
         tagEditorScrollPane = new ScrollPane(tagEditorPane);
         tagEditorLabel = new Label("Tag Editor");
         tagPropertyLabels = new ArrayList();
@@ -266,10 +265,6 @@ public class Workspace extends AppWorkspaceComponent {
         return htmlEngine;
     }
 
-    public void disableButton(Button button, boolean selectable){
-        button.setDisable(selectable);
-    }
-    
     /**
      * Accessor method for getting the html tree, which contains all the tags
      * for the page being edited.
@@ -319,13 +314,14 @@ public class Workspace extends AppWorkspaceComponent {
         treeScrollPane.getStyleClass().add(CLASS_MAX_PANE);
         tagEditorLabel.getStyleClass().add(CLASS_HEADING_LABEL);
     }
-
+  
     /**
      * This function reloads all the controls for editing tag attributes into
      * the workspace.
      */
     @Override
     public void reloadWorkspace() {
+         DataManager dataManager = (DataManager) app.getDataComponent();
         try {
             // WE DON'T WANT TO RESPOND TO EVENTS FORCED BY
             // OUR INITIALIZATION SELECTIONS
@@ -335,7 +331,6 @@ public class Workspace extends AppWorkspaceComponent {
             tagPropertyLabels.clear();
             tagPropertyTextFields.clear();
             tagEditorPane.getChildren().clear();
-
             // FIRST ADD THE LABEL
             tagEditorPane.add(tagEditorLabel, 0, 0, 2, 1);
 
@@ -343,10 +338,7 @@ public class Workspace extends AppWorkspaceComponent {
             TreeItem selectedItem = (TreeItem) htmlTree.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {
                 HTMLTagPrototype selectedTag = (HTMLTagPrototype) selectedItem.getValue();
-                String tagName = selectedTag.getTagName();
-               // if (!isLegalParent(tagName)) {
-                                    
-                //}
+                
                 HashMap<String, String> attributes = selectedTag.getAttributes();
                 Collection<String> keys = attributes.keySet();
                 int row = 1;
@@ -366,9 +358,24 @@ public class Workspace extends AppWorkspaceComponent {
                 }
             }
             
+            if (selectedItem != null){
+                HTMLTagPrototype selectedTag = (HTMLTagPrototype) selectedItem.getValue();
+                String selectedTagName = selectedTag.getTagName();
+                ArrayList<HTMLTagPrototype> htmlTags = dataManager.getTags();
+                int i = 0;
+                for (Button b : tagButtons) {
+                    HTMLTagPrototype tag = (HTMLTagPrototype) htmlTags.get(i);
+                    i++;
+                    if (!(tag.isLegalParent(selectedTagName))) {
+                        b.setDisable(true);
+                    }
+                    else {
+                        b.setDisable(false);
+                    }
+                }
+            }
 
             // LOAD THE CSS
-            DataManager dataManager = (DataManager) app.getDataComponent();
             cssEditor.setText(dataManager.getCSSText());
 
             // THEN FORCE THE CHANGES TO THE TEMP HTML PAGE
