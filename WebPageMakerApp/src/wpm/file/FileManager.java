@@ -225,16 +225,15 @@ public class FileManager implements AppFileComponent {
         FileWriter fWriter = null;
         BufferedWriter writer = null;
         DataManager dataManager = (DataManager) data;
-        TreeItem root = dataManager.getHTMLRoot();
-        HTMLTagPrototype tag = (HTMLTagPrototype) root.getValue();
+        TreeItem html = dataManager.getHTMLRoot();
         
         try {
          
             fWriter = new FileWriter(index);
             writer = new BufferedWriter(fWriter);
-            writer.write(tag.toString() + "\n");
-            ObservableList list  = root.getChildren();
-            for(Object child : list) {
+            //writer.write(tag.toString() + "\n");
+            depthFirstTraversal(html, writer, dataManager);
+            /*for(Object child : list) {
                 TreeItem treeChild = (TreeItem) child;
                 HTMLTagPrototype newTag = (HTMLTagPrototype) treeChild.getValue();
                 writer.write(newTag.toString());
@@ -256,7 +255,7 @@ public class FileManager implements AppFileComponent {
                         else if (newNewTag.getTagName().equalsIgnoreCase("p")) {
                             writer.write("<" + newNewTag.getTagName() + " class=\"" + newNewTag.getAttribute("class") + "\"" + ">");
                         }
-                        else if (newTag.getTagName().equalsIgnoreCase("img")) {
+                        else if (newNewTag.getTagName().equalsIgnoreCase("img")) {
                             writer.write("<" + newNewTag.getTagName() + " src=\"" + newNewTag.getAttribute("src") + "\" " + "alt=\"" + newNewTag.getAttribute("alt") + "\">");
                         }
                         else if (newNewTag.getTagName().equalsIgnoreCase("br") || newNewTag.getTagName().equalsIgnoreCase("head") || newNewTag.getTagName().equalsIgnoreCase("title")) {
@@ -275,7 +274,7 @@ public class FileManager implements AppFileComponent {
                         writer.write("</" + newTag.getTagName() + ">\n");
                     }
                 }
-            }
+            }*/
              writer.close();
         }
            //System.out.println("THIS SHOULD EXPORT THE WEB PAGE TO THE temp DIRECTORY, INCLUDING THE CSS FILE");
@@ -285,6 +284,96 @@ public class FileManager implements AppFileComponent {
             dialog.show("File Management Error", "There was an error writing to the temp file.");
         }
     }
+    
+    void depthFirstTraversal(TreeItem html, BufferedWriter writer, DataManager data) {
+        boolean hasClosingTag = true;
+        try {
+        HTMLTagPrototype tag = (HTMLTagPrototype) html.getValue();
+        String tagName = tag.getTagName();
+        HashMap<String, String> attributes = tag.getAttributes();
+            switch (tag.toString()) {
+                case ("<html>"): 
+                    writer.write(tag.toString());
+                    break;
+                case ("<head>"): 
+                    writer.write(tag.toString());
+                    break;
+                case ("<title>"): 
+                    writer.write(tag.toString()); 
+                    break;
+                case ("<link>"):
+                    writer.write("<" + tagName + " rel=\"" + tag.getAttribute("rel") + "\"" + " href=\"" + tag.getAttribute("href") + "\" type=\"" + tag.getAttribute("type") + "\">"); 
+                    hasClosingTag = false;
+                    break;
+                case ("<a>"): 
+                    writer.write("<" + tagName + " href=\"" + tag.getAttribute("href") + "\">"); 
+                    break;
+                case ("<br>"):
+                    writer.write("<" + tagName +  ">"); hasClosingTag = false; 
+                    break;
+                case ("<div>"): 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">"); 
+                    break;
+                case ("<img>"): 
+                    writer.write("<" + tagName + " src=\"" + tag.getAttribute("src") + "\" " + "alt=\"" + tag.getAttribute("alt") + "\">"); 
+                    hasClosingTag=false; 
+                    break;
+                case ("<li>"):  
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">"); 
+                    break;
+                case ("<ol>"): 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">"); 
+                    break;
+                case ("<p>"): 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">"); 
+                    break;
+                case ("<Text>"): 
+                    writer.write(tag.getAttribute("text"));
+                    hasClosingTag = false; 
+                    break;
+                case ("<table>"):  
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">"); 
+                    break;
+                case ("td"): 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">"); 
+                    break;
+                case ("tr"): 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">");
+                    break;
+                case ("ul"):
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">"); 
+                    break;
+                default: 
+                    writer.write(""); 
+                    break;
+            }
+            
+            int numChildren = html.getChildren().size();
+            for (int i = 0; i < numChildren; i++) {
+                TreeItem child = (TreeItem) html.getChildren().get(i);
+                depthFirstTraversal(child, writer, data);
+            }
+            writer.write("\n");
+            if (hasClosingTag == true) {
+                String temp = html.getValue().toString();
+                temp = temp.substring(1);
+                temp = "</".concat(temp);
+                writer.write(temp);
+            }
+
+        }
+        
+        catch (IOException ioe) {
+            AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
+            dialog.show("File Management Error", "There was an error writing to the temp file.");
+        }
+    }
+    
+    
+    
+    
+    
+    
  
 /**
      * This function writes the CSS content out to the CSS file
