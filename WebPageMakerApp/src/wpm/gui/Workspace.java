@@ -83,6 +83,7 @@ public class Workspace extends AppWorkspaceComponent {
     ScrollPane tagToolbarScrollPane;
     ArrayList<Button> tagButtons;
     HashMap<String, HTMLTagPrototype> tags;
+    Button removeButton = new Button();
 
     // THIS IS THE TREE REPRESENTING THE DOM
     TreeView htmlTree;
@@ -167,7 +168,7 @@ public class Workspace extends AppWorkspaceComponent {
         String imagePath = FILE_PROTOCOL + PATH_IMAGES + "RemoveElement.png";
         Image buttonImage = new Image(imagePath);
 
-        Button removeButton = new Button();
+        
         removeButton.setGraphic(new ImageView(buttonImage));
         removeButton.setMaxWidth(BUTTON_TAG_WIDTH);
         removeButton.setMinWidth(BUTTON_TAG_WIDTH);
@@ -372,6 +373,17 @@ public class Workspace extends AppWorkspaceComponent {
                     else {
                         b.setDisable(false);
                     }
+                }
+            }
+            
+            if (selectedItem != null) {
+                HTMLTagPrototype selectedTag = (HTMLTagPrototype) selectedItem.getValue();
+                String selectedTagName = selectedTag.getTagName();
+                if (selectedTagName.equalsIgnoreCase("html") || selectedTagName.equalsIgnoreCase("head") || selectedTagName.equalsIgnoreCase("link") || selectedTagName.equalsIgnoreCase("title") || selectedTagName.equalsIgnoreCase("body")){
+                    removeButton.setDisable(true);
+                }
+                else {
+                    removeButton.setDisable(false);
                 }
             }
 
