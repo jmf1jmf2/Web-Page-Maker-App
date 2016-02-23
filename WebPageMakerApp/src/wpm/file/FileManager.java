@@ -231,54 +231,9 @@ public class FileManager implements AppFileComponent {
          
             fWriter = new FileWriter(index);
             writer = new BufferedWriter(fWriter);
-            //writer.write(tag.toString() + "\n");
             depthFirstTraversal(html, writer, dataManager);
-            /*for(Object child : list) {
-                TreeItem treeChild = (TreeItem) child;
-                HTMLTagPrototype newTag = (HTMLTagPrototype) treeChild.getValue();
-                writer.write(newTag.toString());
-                ObservableList childList = treeChild.getChildren();
-                for(Object newChild : childList) {
-                    TreeItem nextTreeChild = (TreeItem) newChild;
-                    HTMLTagPrototype newNewTag = (HTMLTagPrototype) nextTreeChild.getValue();
-                    HashMap<String, String> attributes = newNewTag.getAttributes();
-                    Collection<String> keys = attributes.keySet();
-                        if (newNewTag.getTagName().equalsIgnoreCase("a")) {
-                            writer.write("<" + newNewTag.getTagName() + " href=\"" + newNewTag.getAttribute("href") + "\">");
-                        }   
-                        else if (newNewTag.getTagName().equalsIgnoreCase("title")) {
-                            writer.write(newNewTag.toString() + "\n");
-                        }
-                        else if (newNewTag.getTagName().equalsIgnoreCase("text")) {
-                            writer.write(newNewTag.getAttribute("text"));
-                        }
-                        else if (newNewTag.getTagName().equalsIgnoreCase("p")) {
-                            writer.write("<" + newNewTag.getTagName() + " class=\"" + newNewTag.getAttribute("class") + "\"" + ">");
-                        }
-                        else if (newNewTag.getTagName().equalsIgnoreCase("img")) {
-                            writer.write("<" + newNewTag.getTagName() + " src=\"" + newNewTag.getAttribute("src") + "\" " + "alt=\"" + newNewTag.getAttribute("alt") + "\">");
-                        }
-                        else if (newNewTag.getTagName().equalsIgnoreCase("br") || newNewTag.getTagName().equalsIgnoreCase("head") || newNewTag.getTagName().equalsIgnoreCase("title")) {
-                        //do nothing
-                        }
-                        else if (newNewTag.getTagName().equalsIgnoreCase("link")) {
-                            writer.write("<" + newNewTag.getTagName() + " rel=\"" + newNewTag.getAttribute("rel") + "\"" + " href=\"" + newNewTag.getAttribute("href") + "\" type=\"" + newNewTag.getAttribute("type") + "\">");
-                        }
-                        else {
-                            writer.write("<" + newNewTag.getTagName() + " class=\"" + newNewTag.getAttribute("class") + "\" " + "id=\"" + newNewTag.getAttribute("id") + "\">");
-                        }
-                    if(newNewTag.hasClosingTag()) {
-                        writer.write("</" + newNewTag.getTagName() + ">\n");
-                    }
-                    else {
-                        writer.write("</" + newTag.getTagName() + ">\n");
-                    }
-                }
-            }*/
-             writer.close();
+            writer.close();
         }
-           //System.out.println("THIS SHOULD EXPORT THE WEB PAGE TO THE temp DIRECTORY, INCLUDING THE CSS FILE");
-        
         catch (IOException ioe) {
             AppMessageDialogSingleton dialog = AppMessageDialogSingleton.getSingleton();
             dialog.show("File Management Error", "There was an error writing to the temp file.");
@@ -293,55 +248,59 @@ public class FileManager implements AppFileComponent {
         HashMap<String, String> attributes = tag.getAttributes();
             switch (tag.toString()) {
                 case ("<html>"): 
-                    writer.write(tag.toString());
+                    writer.write(tag.toString() + "\n");
                     break;
                 case ("<head>"): 
-                    writer.write(tag.toString());
+                    writer.write(tag.toString() + "\n");
+                    break;
+                case ("<body>"):
+                    writer.write(tag.toString() + "\n");
                     break;
                 case ("<title>"): 
-                    writer.write(tag.toString()); 
+                    writer.write(tag.toString() + "\n"); 
                     break;
                 case ("<link>"):
-                    writer.write("<" + tagName + " rel=\"" + tag.getAttribute("rel") + "\"" + " href=\"" + tag.getAttribute("href") + "\" type=\"" + tag.getAttribute("type") + "\">"); 
+                    writer.write("<" + tagName + " rel=\"" + tag.getAttribute("rel") + "\"" + " href=\"" + tag.getAttribute("href") + "\" type=\"" + tag.getAttribute("type") + "\">" + "\n"); 
                     hasClosingTag = false;
                     break;
                 case ("<a>"): 
-                    writer.write("<" + tagName + " href=\"" + tag.getAttribute("href") + "\">"); 
+                    writer.write("<" + tagName + " href=\"" + tag.getAttribute("href") + "\">" + "\n"); 
                     break;
                 case ("<br>"):
-                    writer.write("<" + tagName +  ">"); hasClosingTag = false; 
+                    writer.write("<" + tagName +  ">" + "\n"); 
+                    hasClosingTag = false; 
                     break;
                 case ("<div>"): 
-                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">"); 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">" + "\n"); 
                     break;
                 case ("<img>"): 
-                    writer.write("<" + tagName + " src=\"" + tag.getAttribute("src") + "\" " + "alt=\"" + tag.getAttribute("alt") + "\">"); 
+                    writer.write("<" + tagName + " src=\"" + tag.getAttribute("src") + "\" " + "alt=\"" + tag.getAttribute("alt") + "\">" + "\n"); 
                     hasClosingTag=false; 
                     break;
                 case ("<li>"):  
-                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">"); 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">" + "\n"); 
                     break;
                 case ("<ol>"): 
-                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">"); 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\" " + "id=\"" + tag.getAttribute("id") + "\">" + "\n"); 
                     break;
                 case ("<p>"): 
-                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">"); 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">" + "\n"); 
                     break;
                 case ("<Text>"): 
-                    writer.write(tag.getAttribute("text"));
+                    writer.write(tag.getAttribute("text") + "\n");
                     hasClosingTag = false; 
                     break;
                 case ("<table>"):  
-                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">"); 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">" + "\n"); 
                     break;
                 case ("td"): 
-                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">"); 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">" + "\n"); 
                     break;
                 case ("tr"): 
-                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">");
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">" + "\n");
                     break;
                 case ("ul"):
-                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">"); 
+                    writer.write("<" + tagName + " class=\"" + tag.getAttribute("class") + "\"" + ">" + "\n"); 
                     break;
                 default: 
                     writer.write(""); 
