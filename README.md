@@ -4,7 +4,7 @@ This application allows basic HTML and CSS generation/editing with a simple, eas
 
 CONFIGURATION
 -------------
-Install Web-Page-Maker-App
+Download Web-Page-Maker-App
 
 Add the following libraries to the project:
 
